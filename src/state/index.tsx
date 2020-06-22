@@ -65,24 +65,21 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
         const endpoint = process.env.REACT_APP_TOKEN_ENDPOINT || '/token';
         const params = new window.URLSearchParams({ identity, roomName });
 
-        return fetch(`${endpoint}?${params}`, { headers }).then(res => res.text());
+        return fetch(`${endpoint}?${params}`, { headers }).then((res) => res.text());
       },
     };
   }
 
-  const getToken: StateContextType['getToken'] = (name, room) => {
+  const getToken: StateContextType['getToken'] = () => {
     setIsFetching(true);
-    return contextValue
-      .getToken(name, room)
-      .then(res => {
-        setIsFetching(false);
-        return res;
-      })
-      .catch(err => {
-        setError(err);
-        setIsFetching(false);
-        return Promise.reject(err);
-      });
+    return new Promise((resolve, reject) => {
+      const match = window.location.href.match(/access_token=([^&]*)/);
+      if (match && match[1]) {
+        resolve(match[1]);
+      } else {
+        reject('No access token found in the URL.');
+      }
+    });
   };
 
   return <StateContext.Provider value={{ ...contextValue, getToken }}>{props.children}</StateContext.Provider>;
