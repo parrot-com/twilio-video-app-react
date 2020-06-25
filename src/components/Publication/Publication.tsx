@@ -1,9 +1,7 @@
 import React from 'react';
 import useTrack from '../../hooks/useTrack/useTrack';
 import AudioTrack from '../AudioTrack/AudioTrack';
-import VideoTrack from '../VideoTrack/VideoTrack';
 
-import { IVideoTrack } from '../../types';
 import {
   AudioTrack as IAudioTrack,
   LocalTrackPublication,
@@ -33,15 +31,13 @@ export default function Publication({
 
   switch (track.kind) {
     case 'video':
-      return (
-        <VideoTrack
-          track={track as IVideoTrack}
-          priority={videoPriority}
-          isLocal={track.name.includes('camera') && isLocal}
-        />
-      );
+      return null;
     case 'audio':
-      return disableAudio ? null : <AudioTrack userId={participant.identity} track={track as IAudioTrack} />;
+      // try to find speaker ID in URL and only allow that speaker to be heard
+      const match = window.location.href.match(/speaker_id=([^&]+)/);
+      if (match && match[1] && match[1] === participant.identity)
+        return <AudioTrack userId={participant.identity} track={track as IAudioTrack} />;
+      else return null;
     default:
       return null;
   }
