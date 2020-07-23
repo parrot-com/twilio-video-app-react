@@ -11,9 +11,10 @@ export default function AudioTrack({ userId, track }: AudioTrackProps) {
   const outputDevices = useAudioOutputDevices();
   const audioEl = useRef<HTMLAudioElement>();
 
-  const sinkId = useMemo(() => {
-    return outputDevices.find(({ label }) => label.indexOf(userId) >= 0)?.deviceId;
-  }, [outputDevices, userId]);
+  const sinkId = useMemo(() => outputDevices.find(({ label }) => label.indexOf(userId) >= 0)?.deviceId, [
+    outputDevices,
+    userId,
+  ]);
 
   useEffect(() => {
     audioEl.current = track.attach();
